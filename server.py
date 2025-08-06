@@ -3,10 +3,6 @@ import socket
 import datetime
 from threading import Thread
 
-
-
-
-
 client_connection = None;
 
 
@@ -36,7 +32,7 @@ def server():
         print("Sent 'hello'")
     except Exception:
         print("Failed to send initial hello")
-    print("Screenshot receiver thread started")
+
 
 def receive_loop():
     """
@@ -62,11 +58,10 @@ def receive_loop():
                         break
                     img_data += chunk
 
-                # יצירת שם לקובץ לפי תאריך ושעה
-                import datetime
-                filename = f"received_screenshot_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.png"
+                # Create a file name based on date and time
+                filename = f"received_screenshot_{datetime.datetime.now().strftime('%H-%M-%S')}.png"
 
-                # שמירת התמונה לקובץ
+                # Saving the image to a file
                 with open(filename, "wb") as f_out:
                     f_out.write(img_data)
 
@@ -95,6 +90,7 @@ def on_click(x, y, button, pressed):
     except Exception:
         print("Failed to send; client maybe disconnected")
 
+
 def on_move(x, y):
     """
     Sends a message to the client when the mouse is moved.
@@ -110,6 +106,7 @@ def on_move(x, y):
     except Exception:
         print("Failed to send; client maybe disconnected")
 
+
 def on_scroll(x, y, dx, dy):
     """
     Sends a message to the client when the mouse wheel is scrolled.
@@ -124,12 +121,12 @@ def on_scroll(x, y, dx, dy):
     except Exception:
         print("Failed to send; client maybe disconnected")
 
+
 def on_press(key):
     """
     Sends a message when a key is pressed.
     If F12 is pressed, it tells the client to take a screenshot.
     """
-
 
     if client_connection is None:
         return
@@ -159,6 +156,7 @@ def on_press(key):
     except Exception:
         print("Failed to send; client maybe disconnected")
 
+
 def on_release(key):
     """
     Sends a message when a key is released.
@@ -178,13 +176,12 @@ def on_release(key):
         print("Failed to send; client maybe disconnected")
 
 
-
-
 if __name__ == "__main__":
     """
-      Starts the server and begins listening for mouse and keyboard events.
-      Each listener runs in a separate thread.
-      """
+    Starts the server and begins listening for mouse and keyboard events.
+    Each listener runs in a separate thread.
+    To request a screenshot from the client, press F12
+    """
     server()
     mouse_thread = Thread(target=lambda: mouse.Listener(on_click=on_click, on_move=on_move, on_scroll=on_scroll).run())
     kb_thread = Thread(target=lambda: keyboard.Listener(on_press=on_press, on_release=on_release).run())
@@ -194,7 +191,3 @@ if __name__ == "__main__":
     kb_thread.start()
     mouse_thread.join()
     kb_thread.join()
-
-
-
-

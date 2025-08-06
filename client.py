@@ -3,6 +3,7 @@ from pynput import mouse
 from pynput import keyboard
 from PIL import ImageGrab
 import datetime
+import os
 
 
 def main():
@@ -20,18 +21,15 @@ def main():
     key_ctrl = keyboard.Controller()
 
     # button_map - maps button names from the server to real mouse buttons
-    """
-    Used to translate button names like "left" or "right" to actual mouse buttons.
-    """
+    # Used to translate button names like "left" or "right" to actual mouse buttons.
     button_map = {
         "left": mouse.Button.left,
         "right": mouse.Button.right,
         "middle": mouse.Button.middle,
     }
+
     # special_keys - maps special key names to real keyboard keys
-    """
-    Helps identify and press/release special keys like Enter, Ctrl, or Arrow keys.
-    """
+    # Helps identify and press/release special keys like Enter, Ctrl, or Arrow keys.
     special_keys = {
         "Key.enter": keyboard.Key.enter,
         "Key.shift": keyboard.Key.shift,
@@ -48,10 +46,8 @@ def main():
     }
 
     f = s.makefile()
-    """
-    Limit the number of events so the loop doesn't run forever and we can easily test the code on the same computer
- 
-    """
+
+    # Limit the number of events so the loop doesn't run forever and we can easily test the code on the same computer
     count = 0
     max_events = 4
 
@@ -73,19 +69,15 @@ def main():
             filename = f"client_screenshot_{datetime.datetime.now().strftime('%H-%M-%S')}.png"
             screenshot.save(filename)
 
-            import os
             with open(filename, "rb") as f_img:
                 img_data = f_img.read()
                 img_size = len(img_data)
-                f_img.close()
-                print(f"Sending screenshot of size: {img_size} bytes")
+            print(f"Sending screenshot of size: {img_size} bytes")
 
-                # שליחת גודל התמונה קודם
-                s.send(f"IMG,{img_size}\n".encode("utf-8"))
+            s.send(f"IMG,{img_size}\n".encode("utf-8"))
 
-                # שליחת תוכן התמונה
-                s.sendall(img_data)
-                os.remove(filename)
+            s.sendall(img_data)
+            os.remove(filename)
             print("Screenshot sent.")
 
             continue
@@ -104,7 +96,6 @@ def main():
                 elif state == "0":
                     mouse_ctrl.release(btn)
 
-
             elif event == "MOUSE_MOVE":
                 try:
                     x = int(parts[2])
@@ -120,7 +111,7 @@ def main():
                 except ValueError:
                     pass
         if len(parts) >= 3 and parts[1].startswith("KEY_"):
-            event = parts[1]  # KEY_PRESS או KEY_RELEASE
+            event = parts[1]  # KEY_PRESS or KEY_RELEASE
             key_str = parts[2]
             if key_str == "Key.f12":
                 continue
