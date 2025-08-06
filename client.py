@@ -4,6 +4,7 @@ from pynput import keyboard
 from PIL import ImageGrab
 import datetime
 
+
 def main():
     """
     Connects to the server and listens for remote commands.
@@ -47,6 +48,10 @@ def main():
     }
 
     f = s.makefile()
+    """
+    Limit the number of events so the loop doesn't run forever and we can easily test the code on the same computer
+ 
+    """
     count = 0
     max_events = 4
 
@@ -54,13 +59,10 @@ def main():
     # and do what the server tells us to do (screenshot, mouse, keyboard, etc.)
     for line in f:
 
-
         line = line.strip()
         if not line:
             continue
         print(line)
-
-
 
         parts = line.split(",")
 
@@ -133,14 +135,13 @@ def main():
                 key_ctrl.release(key_obj)
                 print(f"Released: {key_obj}")
 
-
-
         count += 1
         if count >= max_events:
             break
 
     s.close()
     print("Connection closed")
+
 
 if __name__ == "__main__":
     main()
